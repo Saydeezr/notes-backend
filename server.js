@@ -1,40 +1,59 @@
 const express = require('express');
 const fs = require('fs')
 const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 const PORT = process.env.PORT || 3000;
 const app = express();
 
-//making 'public' folder accesible to client 
+
+//use of middleware
 app.use(express.static('public'));
 app.use(express.json());
 
-//brings user to next page
+
+//routes
 app.get('/notes', (req,res) => res.sendFile(path.join(__dirname,'./public/notes.html')));
 
-app.get('/api/notes', (req,res) => res.json('db.json'));
+
+app.get('/api/notes', (req,res) => {
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
+        if(err) {
+            console.error(err)
+            res.status(500).send('Error reading the file');
+        } else { 
+            const notes = JSON.parse(data);
+            res.json(notes)
+        }
+    })
+});
+
 
 app.post('/api/notes', (req,res) => {
     let notes = require('./db/db.json')
-    const { v4: uuidv4 } = require('uuid');
-
     let newNote = {
         ...req.body,
         id: uuidv4
         }
     
     notes.push(newNote);
-    //write new array into db.json
-   fs.writeFile(notes, JSON.stringify(newNote), (err) =>{
+
+   fs.writeFile('./db/db.json', JSON.stringify(notes), (err) => {
     if(err) {
         console.error(err)
     } else {
-        res.json(newNote)
+       return res.json(notes)
     }
    })
 });
 
+app.delete(('/api/notes/:id', (req,res) => {
+    
+}));
+
+
 app.get('*', (req,res) => res.sendFile(path.join(__dirname,'./public/index.html')));
 
+
 app.listen(PORT, () => {
-    console.log(`server turned on`)
+    console.log(`listening on port ${PORT}`)
 })
