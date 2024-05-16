@@ -1,6 +1,11 @@
-[
+const const uuid = require('./helpers/uuid');
+
+const eachTask = [
     {
         "title":"Test Title",
-        "text":"Test text"
+        "text":"Test text",
+        "id": "test id"
     }
 ]
+
+module.exports = tasks;
