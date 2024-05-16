@@ -1,6 +1,6 @@
 const express = require('express');
+const fs = require('fs')
 const path = require('path');
-const uuid = require('./helpers/uuid');
 const PORT = process.env.PORT || 3000;
 const app = express();
 
@@ -14,18 +14,24 @@ app.get('/notes', (req,res) => res.sendFile(path.join(__dirname,'./public/notes.
 app.get('/api/notes', (req,res) => res.json('db.json'));
 
 app.post('/api/notes', (req,res) => {
-    let noteData = require('./db/db.json')
-    //save the data to a vaiable
-    let newNote = (req.body)
-    //add unique id
+    let notes = require('./db/db.json')
+    const { v4: uuidv4 } = require('uuid');
+
+    let newNote = {
+        ...req.body,
+        id: uuidv4
+        }
     
-    //.push() new note to noteData variable 
-    noteData.push(newNote);
+    notes.push(newNote);
     //write new array into db.json
-
-    //respond with new note
-
-})
+   fs.writeFile(notes, JSON.stringify(newNote), (err) =>{
+    if(err) {
+        console.error(err)
+    } else {
+        res.json(newNote)
+    }
+   })
+});
 
 app.get('*', (req,res) => res.sendFile(path.join(__dirname,'./public/index.html')));
 
