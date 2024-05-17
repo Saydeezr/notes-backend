@@ -46,9 +46,23 @@ app.post('/api/notes', (req,res) => {
    })
 });
 
-app.delete(('/api/notes/:id', (req,res) => {
-    
-}));
+app.delete('api/notes/:id', (req,res) => {
+    const noteId = req.params.id;
+    console.log(noteId)
+    fs.readFile('./db/db.json', 'utf8', (err, data) => {
+        if(err) {
+          console.error(err)
+          res.status(500).send('Error reading the file')
+        } else {
+            const notes = JSON.parse(data);
+            const result = notes.filter((note) => note.id != req.params.id);
+            fs.writeFile('./db/db.json', JSON.stringify(result), (err) => {
+                console.error(err);
+                return res.json(result)
+            })
+        }
+    })
+});
 
 
 app.get('*', (req,res) => res.sendFile(path.join(__dirname,'./public/index.html')));
