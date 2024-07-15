@@ -46,7 +46,7 @@ app.post('/api/notes', (req,res) => {
    })
 });
 
-app.delete('api/notes/:id', (req,res) => {
+app.delete('/api/notes/:id', (req,res) => {
     const noteId = req.params.id;
     console.log(noteId)
     fs.readFile('./db/db.json', 'utf8', (err, data) => {
